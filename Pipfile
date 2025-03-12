@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+streamlit = "*"
+pydantic = "*"
+python-dotenv = "*"
+langchain-community = "==0.2.0"
+langchain-core = "==0.2.43"
+langchain-google-genai = "==1.0.5"
+pymysql = "*"
+pymssql = "*"
+uvicorn = "==0.31.0"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
+
+[scripts]
+main = "bash -c 'python main.py'"
