@@ -14,6 +14,7 @@ langchain-google-genai = "==1.0.5"
 pymysql = "*"
 pymssql = "*"
 uvicorn = "==0.31.0"
+requests = "==2.31.0"
 
 [dev-packages]
 
@@ -22,3 +23,4 @@ python_version = "3.12"
 
 [scripts]
 main = "bash -c 'python main.py'"
+streamlit = "streamlit run streamlit/streamlit_app.py"
