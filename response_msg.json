@@ -1,0 +1,11 @@
+{
+  "db_conncted": "Database connected successfully",
+  "db_conncted_error": "Error while connecting to database",
+  "db_conncted_not_found": "Database not found",
+
+  "response_generated": "Response generated successfully",
+  "response_not_generated": "Error while generating response",
+
+  "session_deleted": "Session deleted successfully",
+  "session_delete_error": "Error while session deleted"
+}
