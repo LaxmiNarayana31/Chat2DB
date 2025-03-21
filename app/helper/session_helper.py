@@ -33,7 +33,7 @@ class SessionManager:
 
             engine = create_engine(db_uri)
             sql_database = SQLDatabase.from_uri(db_uri)
-            return sql_database, engine
+            return sql_database, engine, database
         except Exception as e:
             handle_exception(e)
     
@@ -43,8 +43,8 @@ class SessionManager:
                 self.sessions[db_session_id]['db'] = None
                 self.sessions[db_session_id]['engine'].dispose()
 
-            db, engine = self.init_database(user, password, host, port, database, db_type)
-            self.sessions[db_session_id] = {'db': db, 'engine': engine}
+            db, engine, database_name = self.init_database(user, password, host, port, database, db_type)
+            self.sessions[db_session_id] = {'db': db, 'engine': engine, 'db_name': database_name}
         except Exception as e:
             handle_exception(e)
 
