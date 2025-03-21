@@ -16,6 +16,7 @@ Write only the SQL query and nothing else. Do not wrap the SQL query in any othe
 3. Ensure the query is clear, concise, and optimized for execution.
 4. Don't use unknown columns, always use columns from provided schema only.
 5. Limit the subquery to return a single row using LIMIT 1.
+6. Use currently established database name as reference {database_name} for the database name instead of writing the DATABASE() function.
 
 **Examples:**
 - Question: Which 3 artists have the most tracks?  
