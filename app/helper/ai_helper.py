@@ -25,13 +25,17 @@ class ResponseGenerator:
                     response = [dict(zip(columns, row)) for row in rows]
                     sql_query = existed_query
             else:
+                database_name = session_manager.sessions[db_session_id]['db_name']
                 db = session_manager.sessions[db_session_id]['db']
                 chat_history = session_manager.sessions[db_session_id].get('chat_history', [])
                 chat_history.append({"role": "user", "content": user_query})
                 session_manager.sessions[db_session_id]['chat_history'] = chat_history
                 
-                sql_chain = ResponseGenerator.get_sql_chain(db)
-                sql_query = sql_chain.invoke({"question": user_query, "chat_history": chat_history})
+                sql_chain = ResponseGenerator.get_sql_chain(db, database_name)
+                sql_query = sql_chain.invoke({
+                    "question": user_query, 
+                     "chat_history": chat_history
+                    }).strip().replace("\n", " ")
                 
                 with engine.connect() as connection:
                     result = connection.execute(text(sql_query))
@@ -42,27 +46,21 @@ class ResponseGenerator:
                 chat_history.append({"role": "assistant", "content": response})
                 session_manager.sessions[db_session_id]['chat_history'] = chat_history
             
-            return {"sql_query": sql_query.replace("\n", " "), "result": response, "columns": list(columns)}
+            return {"sql_query": sql_query, "result": response, "columns": list(columns)}
         except Exception as e:
             handle_exception(e)
             
 
     @staticmethod
-    def get_sql_chain(db):
+    def get_sql_chain(db, database_name: str):
         try:
-            """
-            Create a chain of operations to generate an SQL query from a user's natural language question.
-
-            Args:
-                db (SQLDatabase): The SQLDatabase object representing the connection.
-            """
             llm = LlmHelper.googleGeminiLlm()
             prompt = ChatPromptTemplate.from_template(sql_template)
-            def get_schema(_):
-                return db.get_table_info()
+           
 
             return (
-                RunnablePassthrough.assign(schema = get_schema)
+                RunnablePassthrough.assign(
+                    schema = lambda _: db.get_table_info(), database_name = lambda _: database_name)
                 | prompt
                 | llm
                 | StrOutputParser()
@@ -92,6 +90,7 @@ class ResponseGenerator:
 
             return {
                 "natural_response": natural_response,
+                "sql_query": sql_result["sql_query"]
             }
         except Exception as e:
             handle_exception(e)
