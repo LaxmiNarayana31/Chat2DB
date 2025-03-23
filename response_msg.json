@@ -1,11 +1,9 @@
 {
-  "db_conncted": "Database connected successfully",
-  "db_conncted_error": "Error while connecting to database",
-  "db_conncted_not_found": "Database not found",
-
-  "response_generated": "Response generated successfully",
-  "response_not_generated": "Error while generating response",
-
-  "session_deleted": "Session deleted successfully",
-  "session_delete_error": "Error while session deleted"
+  "database_connected": "Database connected Successfully",
+  "database_not_connected": "Database not connected!",
+  "something_went_wrong": "Something went wrong",
+  "response_generated": "Response generated Successfully",
+  "all_db_disconnected": "All database disconnected",
+  "db_disconnected": "Database disconnected",
+  "db_session_not_found": "Database session not found"
 }
