@@ -6,17 +6,22 @@ BASE_URL = "http://localhost:7000/api/v1/db"
 
 st.set_page_config(page_title="Chat DB", layout="wide")
 
+# Initialize session state for navigation
 if "page" not in st.session_state:
-    st.session_state.page = "connect"  
+    st.session_state.page = "connect" 
+
+# Initialize session state for storing query response
+if "query_response" not in st.session_state:
+    st.session_state.query_response = None  
 
 # Function to connect to the database
 def connect_to_database(db_connection):
     response = requests.post(f"{BASE_URL}/connect", json=db_connection)
     if response.status_code == 200 and response.json().get("status"):
         st.session_state.db_session_id = response.json()["data"]["db_session_id"]
-        st.session_state.page = "chat"  
+        st.session_state.page = "chat" 
         st.success("Connected to database successfully!")
-        st.rerun()  
+        st.rerun() 
     else:
         st.error("Failed to connect to database. Check your credentials.")
 
@@ -28,15 +33,15 @@ def disconnect_from_database():
         st.session_state.db_session_id = None
         st.session_state.page = "connect"  
         st.success("Database disconnected successfully!")
-        st.rerun() 
+        st.rerun()  
     else:
         st.error("Failed to disconnect database.")
 
 if st.session_state.page == "connect":
-    st.title("Connect to Your Database")
-    
-    col = st.columns([1, 2, 1])[1] 
+    col = st.columns([1, 2, 1])[1]  
     with col:
+        st.title("Connect to Your Database")  
+    
         with st.form("db_connection_form"):
             st.subheader("Enter Database Credentials")
             db_type = st.selectbox("DB Type", ["MYSQL", "POSTGRESQL", "MSSQL", "ORACLE"], key="db_type")
@@ -62,12 +67,11 @@ if st.session_state.page == "connect":
 elif st.session_state.page == "chat":
     col = st.columns([1, 2, 1])[1]  
     with col:
-        st.title("Chat with Your Database")
+        st.title("Chat with Your Database")  
         
         if st.button("Disconnect from Database"):
             disconnect_from_database()
         
-        # Chat Section
         st.subheader("Chat with Database")
         user_query = st.text_area("Enter your query:")
     
@@ -77,22 +81,30 @@ elif st.session_state.page == "chat":
                     "db_session_id": st.session_state.db_session_id,
                     "user_query": user_query
                 }
-                response = requests.post(f"{BASE_URL}/ask", json=db_query)
+                response = requests.post(f"{BASE_URL}/ask_natural", json=db_query)
                 
-                if response.status_code == 200 and response.json().get("status"):
-                    response_data = response.json()["data"]
-                    sql_query = response_data.get("sql_query", "No SQL query generated.")
-                    query_result = response_data.get("data", "No data returned.")
+                if response.status_code == 200:
+                    response_data = response.json()
                     
-                    sql_query = sql_query.strip()  
-                    sql_query = " ".join(sql_query.split())  
-                    
-                    st.write("### SQL Query:")
-                    st.code(sql_query, language="sql")  
-                    
-                    st.write("### Query Result:")
-                    st.write(query_result)
+                    if response_data.get("status"):
+                        # Store response in session state
+                        st.session_state.query_response = {
+                            "explanation": response_data["data"].get("natural_explanation", "No explanation generated."),
+                            "sql_query": response_data["data"].get("sql_query", "No SQL query generated."),
+                            "query_result": response_data["data"].get("data", "No data returned."),
+                        }
+                    else:
+                        st.error(f"API returned failure: {response_data.get('response')}")
                 else:
-                    st.error("Failed to get response from database.")
-            else:
-                st.warning("Database connection not established. Please connect to the database first.")
+                    st.error("Failed to get response from database. API request failed.")
+
+        # Display response
+        if st.session_state.query_response:
+            st.write("### Result:")
+            st.write(st.session_state.query_response["explanation"])
+
+            st.write("### SQL Query:")
+            st.code(st.session_state.query_response["sql_query"], language="sql")  
+
+            st.write("### Query Result:")
+            st.write(st.session_state.query_response["query_result"])
