@@ -1,17 +1,17 @@
 from typing import Optional
 from pydantic import BaseModel
 
-class DBConnectionRequest(BaseModel):
-    user: str
-    password: str
-    host: str
-    port: str
-    database: str
+class DBConnectRequest(BaseModel):
+    db_username: str
+    db_password: str
+    db_host: str
+    db_port: str
+    db_name: str
     db_type: str
 
-class QueryRequest(BaseModel):
+class DBQueryRequest(BaseModel):
     db_session_id : str
     user_query: Optional[str] = None
 
-class TerminateDbSession(BaseModel):
+class DBSessionTermination(BaseModel):
     db_session_id : Optional[str] = None
