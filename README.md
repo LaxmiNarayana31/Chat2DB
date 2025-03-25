@@ -37,5 +37,5 @@ Chat2DB is an innovative application that bridges the gap between natural langua
     ```
   - Start the Streamlit Frontend
     ```
-    Start the Streamlit Frontend
+    pipenv run streamlit
     ```
